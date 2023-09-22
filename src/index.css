@@ -24,3 +24,10 @@ code {
 .hidden {
   text-align: start;
 }
+.footer a{
+  text-decoration: none;
+}
+.footer a:hover{
+text-decoration: underline;
+cursor: pointer;
+}
