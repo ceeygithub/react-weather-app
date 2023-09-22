@@ -1,23 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+
+import React from "react";
+import "./index.css";
+import Search from "./Search";
+import Current from "./Current";
+import Hour from "./Hour";
+import Week from "./Week";
+
 
 function App() {
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+
+    <div className="container my-5 py-5 ">
+
+      <header >
+
+        <Search />
       </header>
+      <main>
+        <Current />
+        <Hour />
+        <Week />
+      </main>
     </div>
   );
 }

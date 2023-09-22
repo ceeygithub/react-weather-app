@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.container {
+  background-color: rgb(247, 243, 255);
+  color: rgb(33, 37, 41);
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  border-radius: 10px;
+
+}
+
+.hidden {
+  text-align: start;
+}
