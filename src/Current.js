@@ -1,62 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Convert from "./Convert.js";
 
-const Current = ({ data }) => {
-    const [weatherData, setWeatherData] = useState(null);
-
-    // Function to calculate Dew Point
-    const calculateDewPoint = (temperature, humidity) => {
-        return temperature - ((100 - humidity) / 5);
-    };
-
-    useEffect(() => {
-        const getWeatherData = () => {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-
-                const apiKey = "597c40c39084687093b091cd48b366f8";
-                const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
-
-                axios.get(apiUrl).then((response) => {
-                    const {
-                        name: city,
-                        main: { temp: temperature, humidity },
-                        visibility: visibilityMeters,
-                        wind: { speed: wind },
-                        weather,
-                        dt: timestamp,
-                        timezone,
-                    } = response.data;
-
-                    const visibility = visibilityMeters / 1000; // Convert visibility to kilometers
-                    const timezoneOffset = timezone * 3600; // Timezone offset in seconds
-                    const currentTime = new Date((timestamp + timezoneOffset) * 1000);
-                    const dew = calculateDewPoint(temperature, humidity);
-
-                    setWeatherData({
-                        city,
-                        temperature,
-                        humidity,
-                        visibility,
-                        wind,
-                        description: weather[0].description,
-                        icon: weather[0].icon,
-                        timestamp,
-                        timezoneOffset,
-                        currentTime,
-                        dew,
-                    });
-                });
-            });
-        };
-
-        // Call the function to fetch weather data when the component is mounted
-        getWeatherData();
-    }, []);
-
+const Current = ({ weatherData }) => {
     if (!weatherData) {
-        // Render a loading indicator or return null while data is being fetched
         return <div>Loading...</div>;
     }
 
@@ -68,16 +15,12 @@ const Current = ({ data }) => {
         wind,
         description,
         icon,
-        currentTime,
+        formattedTime,
         dew,
     } = weatherData;
 
-    // Check if currentTime is null before accessing its properties
-    const formattedTime = currentTime ? currentTime.toLocaleString() : "N/A";
-
     return (
         <div className="current-weather">
-            <p className="weather">Current Weather</p>
             <div className="container border-bottom rounded-0">
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 my-5">
                     <div className="col">
@@ -95,21 +38,11 @@ const Current = ({ data }) => {
                                     <strong>{city}</strong>
                                 </h4>
                                 <h6 className="card-subtitle" id="time-card">
-                                    {formattedTime} {/* Render the formatted time */}
+                                    {formattedTime}
                                 </h6>
                                 <div className="card-text d-flex">
-                                    <span>
-                                        <h1>{temperature}</h1>
-                                    </span>
-                                    <span className="units d-flex">
-                                        <a href="/" className="active">
-                                            <h5>°C</h5>
-                                        </a>
-                                        |
-                                        <a href="/" id="toggle-fahrenheit">
-                                            <h5>°F</h5>
-                                        </a>
-                                    </span>
+
+                                    <Convert celsius={temperature} />
                                 </div>
                                 <h6>{description}</h6>
                             </div>
@@ -149,4 +82,136 @@ const Current = ({ data }) => {
     );
 };
 
-export default Current;
+const Search = ({ onCityChange }) => {
+    const [city, setCity] = useState("");
+    const [weatherData, setWeatherData] = useState(null);
+
+    const handleInputChange = (event) => {
+        setCity(event.target.value);
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const apiKey = "3f6be1c407b0d9d1933561808db358ba";
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+        axios.get(url).then((response) => {
+            const {
+                name: city,
+                main: { temp: temperature, humidity },
+                visibility: visibilityMeters,
+                wind: { speed: wind },
+                weather,
+                dt: timestamp,
+                timezone,
+            } = response.data;
+
+            const visibility = visibilityMeters / 1000;
+            const formattedTime = formatTime(timestamp, timezone);
+            const dew = calculateDewPoint(temperature, humidity);
+
+            const weatherData = {
+                city,
+                temperature,
+                humidity,
+                visibility,
+                wind,
+                description: weather[0].description,
+                icon: weather[0].icon,
+                formattedTime,
+                dew,
+            };
+
+            setWeatherData(weatherData);
+
+            // Pass the searched city to the parent component
+            onCityChange(city);
+        })
+            .catch((error) => {
+                console.error("Error fetching weather data:", error);
+            });
+    };
+
+    useEffect(() => {
+        // Fetch initial weather data when the component mounts
+        // For example, you can use geolocation to get the current city's weather
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                const apiKey = "3f6be1c407b0d9d1933561808db358ba";
+                const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+                axios.get(apiUrl).then((response) => {
+                    const {
+                        name: city,
+                        main: { temp: temperature, humidity },
+                        visibility: visibilityMeters,
+                        wind: { speed: wind },
+                        weather,
+                        dt: timestamp,
+                        timezone,
+                    } = response.data;
+
+                    const visibility = visibilityMeters / 1000;
+                    const formattedTime = formatTime(timestamp, timezone);
+                    const dew = calculateDewPoint(temperature, humidity);
+
+                    const weatherData = {
+                        city,
+                        temperature,
+                        humidity,
+                        visibility,
+                        wind,
+                        description: weather[0].description,
+                        icon: weather[0].icon,
+                        formattedTime,
+                        dew,
+                    };
+
+                    setWeatherData(weatherData);
+                });
+            });
+        }
+    }, [onCityChange]);
+
+    const formatTime = (timestamp, timezone) => {
+        const currentTime = new Date((timestamp + timezone) * 1000);
+        const options = {
+            weekday: 'short',
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZoneName: 'short',
+        };
+        return currentTime.toLocaleString(undefined, options);
+    };
+
+    const calculateDewPoint = (temperature, humidity) => {
+        return temperature - ((100 - humidity) / 5);
+    };
+
+    return (
+        <div>
+            <div className="container-fluid border-bottom">
+                <form className="d-flex my-4" role="search" onSubmit={handleSubmit}>
+                    <input
+                        className="form-control me-2"
+                        type="search"
+                        placeholder="Enter city"
+                        aria-label="Search"
+                        onChange={handleInputChange}
+                    />
+                    <button className="btn btn-primary" type="submit">
+                        Search
+                    </button>
+                </form>
+            </div>
+            <Current weatherData={weatherData} />
+        </div>
+    );
+};
+
+export default Search;
+
