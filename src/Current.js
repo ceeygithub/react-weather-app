@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Convert from "./Convert.js";
+<<<<<<< HEAD
 import WeatherForecast from "./WeatherForecast.js";
 import WeatherHour from "./WeatherHour.js";
 import { ThreeDots } from 'react-loader-spinner'
@@ -22,6 +23,12 @@ const Current = ({ weatherData }) => {
                 visible={true}
             />
         </div>;
+=======
+
+const Current = ({ weatherData }) => {
+    if (!weatherData) {
+        return <div>Loading...</div>;
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
     }
 
     const {
@@ -109,6 +116,7 @@ const Search = ({ onCityChange }) => {
         setCity(event.target.value);
     };
 
+<<<<<<< HEAD
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -119,6 +127,15 @@ const Search = ({ onCityChange }) => {
             const response = await axios.get(url);
             const {
                 coords: coord,
+=======
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const apiKey = "3f6be1c407b0d9d1933561808db358ba";
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+        axios.get(url).then((response) => {
+            const {
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
                 name: city,
                 main: { temp: temperature, humidity },
                 visibility: visibilityMeters,
@@ -133,7 +150,10 @@ const Search = ({ onCityChange }) => {
             const dew = calculateDewPoint(temperature, humidity);
 
             const weatherData = {
+<<<<<<< HEAD
                 coord,
+=======
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
                 city,
                 temperature,
                 humidity,
@@ -149,6 +169,7 @@ const Search = ({ onCityChange }) => {
 
             // Pass the searched city to the parent component
             onCityChange(city);
+<<<<<<< HEAD
             // handle successful response
         } catch (error) {
             if (error.response && error.response.status === 429) {
@@ -163,6 +184,14 @@ const Search = ({ onCityChange }) => {
     };
 
 
+=======
+        })
+            .catch((error) => {
+                console.error("Error fetching weather data:", error);
+            });
+    };
+
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
     useEffect(() => {
         // Fetch initial weather data when the component mounts
         // For example, you can use geolocation to get the current city's weather
@@ -172,12 +201,19 @@ const Search = ({ onCityChange }) => {
                 const latitude = position.coords.latitude;
                 const longitude = position.coords.longitude;
 
+<<<<<<< HEAD
                 const apiKey = "597c40c39084687093b091cd48b366f8";
+=======
+                const apiKey = "3f6be1c407b0d9d1933561808db358ba";
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
                 const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
 
                 axios.get(apiUrl).then((response) => {
                     const {
+<<<<<<< HEAD
                         coords: coord,
+=======
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
                         name: city,
                         main: { temp: temperature, humidity },
                         visibility: visibilityMeters,
@@ -201,6 +237,7 @@ const Search = ({ onCityChange }) => {
                         icon: weather[0].icon,
                         formattedTime,
                         dew,
+<<<<<<< HEAD
                         coord,
                     };
 
@@ -215,11 +252,20 @@ const Search = ({ onCityChange }) => {
                             console.error("Error fetching data:", error.message);
                         }
                     });
+=======
+                    };
+
+                    setWeatherData(weatherData);
+                });
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
             });
         }
     }, [onCityChange]);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
     const formatTime = (timestamp, timezone) => {
         const currentTime = new Date((timestamp + timezone) * 1000);
         const options = {
@@ -227,6 +273,7 @@ const Search = ({ onCityChange }) => {
             hour: 'numeric',
             minute: 'numeric',
             timeZoneName: 'short',
+<<<<<<< HEAD
             hour12: true,
             timeZone: 'UTC',
         };
@@ -234,6 +281,12 @@ const Search = ({ onCityChange }) => {
     };
 
 
+=======
+        };
+        return currentTime.toLocaleString(undefined, options);
+    };
+
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
     const calculateDewPoint = (temperature, humidity) => {
         return temperature - ((100 - humidity) / 5);
     };
@@ -255,11 +308,18 @@ const Search = ({ onCityChange }) => {
                 </form>
             </div>
             <Current weatherData={weatherData} />
+<<<<<<< HEAD
             {weatherData && <WeatherHour coords={weatherData.coord} />}
             {weatherData && <WeatherForecast coords={weatherData.coord} />}
         </div>
 
     );
 };
+=======
+        </div>
+    );
+};
+
+>>>>>>> 19b72df492d488607d91c4bc28e90fd85f8bde93
 export default Search;
 
