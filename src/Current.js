@@ -6,7 +6,22 @@ import WeatherHour from "./WeatherHour.js";
 import { ThreeDots } from 'react-loader-spinner'
 
 
+const api = axios.create({
+    baseURL: 'https://api.openweathermap.org/data/2.5',
+});
 
+// Add an interceptor to handle errors globally
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 429) {
+            // Handle 429 error (rate limit exceeded)
+            console.error("API rate limit exceeded. Please try again later.");
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 const Current = ({ weatherData }) => {
     if (!weatherData) {
@@ -112,7 +127,7 @@ const Search = ({ onCityChange }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const apiKey = "597c40c39084687093b091cd48b366f8";
+        const apiKey = "2daf65f0cdaa917f11026e8a128ce271";
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
         try {
@@ -151,14 +166,8 @@ const Search = ({ onCityChange }) => {
             onCityChange(city);
             // handle successful response
         } catch (error) {
-            if (error.response && error.response.status === 429) {
-                console.error("API rate limit exceeded. Retrying in a moment...");
-                // Retry after an increasing delay (exponential backoff)
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
-                await axios.get(url); // Retry the request
-            } else {
-                console.error("Error fetching weather data:", error);
-            }
+            // Add user feedback for city not found or other API errors
+            console.error("Error fetching weather data:", error);
         }
     };
 
@@ -172,7 +181,7 @@ const Search = ({ onCityChange }) => {
                 const latitude = position.coords.latitude;
                 const longitude = position.coords.longitude;
 
-                const apiKey = "597c40c39084687093b091cd48b366f8";
+                const apiKey = "2daf65f0cdaa917f11026e8a128ce271";
                 const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
 
                 axios.get(apiUrl).then((response) => {
